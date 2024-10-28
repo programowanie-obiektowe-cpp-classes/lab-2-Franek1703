@@ -12,28 +12,26 @@ public:
     ResourceManager() : resource_(new Resource()) {}
 
     // Konstruktor kopiujący
-    ResourceManager(const ResourceManager& other) : resource_(other.resource_) {}
+   ResourceManager(const ResourceManager& other) : resource_(new Resource(*other.resource_)) {}
 
     // Operator przypisania kopiujący
-    ResourceManager& operator=(const ResourceManager& other)
-    {
+    ResourceManager& operator=(const ResourceManager& other) {
         if (this != &other) {
-            resource_ = other.resource_;
+            delete resource_;
+            resource_ = new Resource(*other.resource_);
         }
         return *this;
     }
 
-    ResourceManager(ResourceManager&& other) noexcept : resource_(std::move(other.resource_)) {}
-
-    ResourceManager& operator=(ResourceManager&& other) noexcept
+    double get() const
     {
-        if (this != &other) {
-            resource_ = std::move(other.resource_);
+        if (resource_) {
+            return resource_->get();
         }
-        return *this;
+        throw std::runtime_error("Resource is not initialized.");
     }
 
-    double get() const { return resource_->get(); }
-
-    ~ResourceManager() { delete resource_; }
+    ~ResourceManager() {
+        delete resource_;
+    }
 };
